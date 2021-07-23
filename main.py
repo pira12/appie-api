@@ -155,6 +155,7 @@ if __name__ == '__main__':
         ''' The process which gets run everyday at 01:00. '''
         # Start the chrome driver.
         global driver
+        # Fill in the path to chromedriver.
         driver = webdriver.Chrome('/home/pira/Documents/Personal/' +
                                   'webdriver/chromedriver')
         # Navigate and scrape current and next month.
