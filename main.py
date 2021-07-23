@@ -4,6 +4,8 @@ from pprint import pprint
 from Google import Create_Service, convert_to_RFC_datetime
 from datetime import datetime, timedelta
 from threading import Timer
+import time
+import schedule
 
 
 def login_navigate():
@@ -149,18 +151,12 @@ if __name__ == '__main__':
     # Creates calendar if needed.
     create_calendar()
 
-    # Start the chrome driver.
-    driver = webdriver.Chrome('/home/pira/Documents/Personal/' +
-                              'webdriver/chromedriver')
-
-    x = datetime.today()
-    y = x.replace(day=x.day, hour=1, minute=0, second=0, microsecond=0) + \
-        timedelta(days=1)
-    delta_t = y - x
-    secs = delta_t.total_seconds()
-
     def run():
         ''' The process which gets run everyday at 01:00. '''
+        # Start the chrome driver.
+        global driver
+        driver = webdriver.Chrome('/home/pira/Documents/Personal/' +
+                                  'webdriver/chromedriver')
         # Navigate and scrape current and next month.
         login_navigate()
         current_month_shifts = scrape_data()
@@ -173,5 +169,10 @@ if __name__ == '__main__':
 
         driver.close()
 
-    t = Timer(secs, run)
-    t.start()
+    # Refresh the workcalender every 6 hours.
+    waiting_time = 60 * 60 * 6
+    schedule.every(waiting_time).seconds.do(run)
+
+    while 1:
+        schedule.run_pending()
+        time.sleep(1)
