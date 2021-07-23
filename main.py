@@ -83,7 +83,7 @@ def update_calendar(shifts):
             },
             'summary' : 'AH Werk',
             'description' : shift[2],
-            'colorId' : 5,
+            'colorId' : 7,
             'status' : 'confirmed',
             'visibility' : 'private'
         }
@@ -114,6 +114,13 @@ def get_calendar_id(title):
     return my_calender_id
 
 
+def navigate_next_month():
+    ''' Navigates to the next moth and scrapes the info. '''
+    next_button = driver.find_element_by_xpath('/html/body/form/table/tbody/tr[2]/td/table/tbody/tr/td[2]/table/tbody/tr/td[2]/span')
+    next_button.click()
+
+
+
 if __name__ == '__main__':
     # Connecting the google calendar API.
     CLIENT_SECRET_FILE = 'Client_Secret.json'
@@ -129,12 +136,14 @@ if __name__ == '__main__':
     driver = webdriver.Chrome('/home/pira/Documents/Personal/' +
                             'webdriver/chromedriver')
 
-    # First navigate and scrape.
+    # Navigate and scrape current and next month.
     login_navigate()
-    shifts = scrape_data()
+    current_month_shifts = scrape_data()
+    navigate_next_month()
+    next_month_shifts = scrape_data()
 
     # Clean the calender and update the shifts.
     clear_calendar()
-    update_calendar(shifts)
+    update_calendar(current_month_shifts + next_month_shifts)
 
     driver.close()
