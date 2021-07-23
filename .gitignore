@@ -1,5 +1,5 @@
 # Ignore the login credentials
 creds.py
 Client_Secret.json
-./token files
-./__pycache__
+token files/
+__pycache__/
