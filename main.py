@@ -51,7 +51,10 @@ def scrape_data():
 
     # Divide the times into start and ending time.
     hour_adjustment = -2
+    final_shifts = []
     for shift in all_shifts:
+        if len(shift) == 1:
+            continue
         shift[1] = shift[1].replace('(', '')
         shift[1] = shift[1].replace(')', '')
         shift[1] = shift[1].split(' - ')
@@ -63,9 +66,10 @@ def scrape_data():
                                               int(shift[1][1].split(':')[0]) +
                                               hour_adjustment,
                                               int(shift[1][1].split(':')[1]))
-        shift = shift[1:2]
+        shift[1] = shift[1:2][0]
+        final_shifts.append(shift)
 
-    return all_shifts
+    return final_shifts
 
 
 def create_calendar():
@@ -156,24 +160,26 @@ if __name__ == '__main__':
         # Start the chrome driver.
         global driver
         # Fill in the path to chromedriver.
-        driver = webdriver.Chrome('/home/pira/Documents/Personal/' +
-                                  'webdriver/chromedriver')
+        driver = webdriver.Chrome()
         # Navigate and scrape current and next month.
         login_navigate()
         current_month_shifts = scrape_data()
         navigate_next_month()
         next_month_shifts = scrape_data()
-
+        driver.close()
         # Clean the calender and update the shifts.
         clear_calendar()
-        update_calendar(current_month_shifts + next_month_shifts)
+        update_calendar(current_month_shifts)
+        update_calendar(next_month_shifts)
 
-        driver.close()
-
-    # Refresh the workcalender every 6 hours.
-    waiting_time = 60 * 60 * 6
+    # Refresh the workcalender every 20 minutes.
+    waiting_time = 60 * 20
     schedule.every(waiting_time).seconds.do(run)
 
     while 1:
-        schedule.run_pending()
-        time.sleep(1)
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except:
+            driver.close()
+            print("Failed")
