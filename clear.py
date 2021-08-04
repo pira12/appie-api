@@ -114,7 +114,6 @@ def update_calendar(shifts):
                                 sendUpdates=send_updates,
                                 body=event_request_body).execute()
 
-
 def clear_calendar():
     ''' Clear everything on the calendar '''
     my_calender_id = get_calendar_id('AH Werkrooster')
@@ -133,7 +132,7 @@ def clear_calendar():
         page_token = events.get('nextPageToken')
         if not page_token:
             break
-
+            
 
 def get_calendar_id(title):
     ''' Get the calendat id, which is connected with the title'''
@@ -159,35 +158,4 @@ if __name__ == '__main__':
     SCOPES = ['https://www.googleapis.com/auth/calendar']
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
 
-
-    def run():
-        ''' The process which gets run everyday at 01:00. '''
-        # Creates calendar if needed.
-        create_calendar()
-        # Start the chrome driver.
-        global driver
-        # Fill in the path to chromedriver.
-        driver = webdriver.Chrome()
-        # Navigate and scrape current and next month.
-        login_navigate()
-        current_month_shifts = scrape_data()
-        navigate_next_month()
-        next_month_shifts = scrape_data()
-        driver.close()
-
-        # Clean the calender and update the shifts.
-        clear_calendar()
-        update_calendar(current_month_shifts)
-        update_calendar(next_month_shifts)
-
-    # Refresh the workcalender every 20 minutes.
-    waiting_time = 60 * 60
-    schedule.every(10).seconds.do(run)
-
-    while 1:
-        try:
-            schedule.run_pending()
-            time.sleep(1)
-        except:
-            driver.close()
-            print("Failed")
+    clear_calendar()
